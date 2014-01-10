@@ -1,7 +1,7 @@
 check_mk-sas2ircu
 =================
 
-Check_MK Check for SAS2IRCU Raid Controller (used in Dell R200 Server)
+Check_MK Check for SAS2IRCU Raid Controller (used in Dell R200, R210, R210II Server)
 
 This is a free check (agent plugin and server side check) to monitor the state of
 disks and volumes connected to a sas2ircu raid controller.

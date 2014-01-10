@@ -3,7 +3,7 @@
 # Author: Leo Eibler <le@sprossenwanne.at>
 # Date (last updated): 2014-01-09
 # 
-# This is a check for sas2ircu RAID disks (used in Dell R200 Servers)
+# This is a check for sas2ircu RAID disks (used in Dell R200, R210, R210II Servers)
 # the commandline tool 'sas2ircu' has to be installed.
 #
 # place this file in the plugins directory of the check_mk agent

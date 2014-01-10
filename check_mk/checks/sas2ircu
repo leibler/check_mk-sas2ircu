@@ -3,7 +3,7 @@
 # Author: Leo Eibler <le@sprossenwanne.at>
 # Date last updated: 2014-01-09
 #
-# This is the server side check_mk check for sas2ircu raid controller used in dell r200 servers
+# This is the server side check_mk check for sas2ircu raid controller (used in dell r200, r210, r210II servers)
 #
 # Tested with CHECK_MK version 1.2.2p1
 #
