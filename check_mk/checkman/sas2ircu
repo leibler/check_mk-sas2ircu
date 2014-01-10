@@ -1,0 +1,29 @@
+title: Check state of physical disks and volumes of LSI SAS2008, Dell PERC H200 Raid controllers
+agents: linux
+author: Leo Eibler <le@sprossenwanne.at>
+license: Apache License, Version 2.0
+distribution: none
+description:
+ This check monitors the state of the physical disks and volumes
+ of LSI SAS2008, Dell PERC H200 raid controllers (used in Dell R200, R210, R210II servers).
+ The Linux agent sends the neccessary data,
+ if the command line utility {sas2ircu} is found in the shells
+ search path. 
+
+ The utility {sas2ircu} debian x64 package can be downloaded from
+ {http://hwraid.le-vert.net/debian/pool-wheezy/sas2ircu_16.00.00.00-1_amd64.deb} and
+ installed with {dpkg -i sas2ircu_16.00.00.00-1_amd64.deb}.
+
+item:
+ For volumes: The word 'VOLUME' followed by the controller number (1st controller={0}),
+ the volume id and the volume raid type and size.
+ For example {"VOLUME 0/79 (raid1, 1862GB)"} means a volume on 1st controller {0} with
+ id {79} using {raid1} with a size of {1862GB}.
+ For disks: The word 'DISK' followed by the controller number (1st controller={0}),
+ the disk number, the disk model and serial and disk type.
+ For example {"DISK 0/1 ST2000NM0023_Z1X091JJ (SAS_HDD)"} means a disk on 1st controller {0}, 
+ the 2nd disk {1} of model and serial {ST2000NM0023_Z1X091JJ} which is a {SAS_HDD} disk type.
+
+inventory:
+ All disks and volumes of all controllers are automatically inventorized. The current state is
+ taken as the target state.
