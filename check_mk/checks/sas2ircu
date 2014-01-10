@@ -1,0 +1,118 @@
+#!/usr/bin/python
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+# Author: Leo Eibler <le@sprossenwanne.at>
+# Date last updated: 2014-01-09
+#
+# This is the server side check_mk check for sas2ircu raid controller used in dell r200 servers
+#
+# Tested with CHECK_MK version 1.2.2p1
+#
+#
+# EXAMPLE DATA FROM CHECK 'sas2ircu':
+#   <<<sas2ircu>>>
+#   volume 0 79 okay_(oky) 0691440a258e54cc raid1 1907200
+#   disk 0 0 optimal_(opt) 5000c50-0-569e-9bad seagate st2000nm0023 z1x08nwc sas sas_hdd
+#   disk 0 1 optimal_(opt) 5000c50-0-569f-8055 seagate st2000nm0023 z1x091jj sas sas_hdd
+#
+# Integrated RAID Volume State values are as follows:
+#  Okay (OKY) – The volume is active and drives are functioning properly. User data is protected if the current RAID level provides data protection.
+#  Degraded (DGD) – The volume is active. User data is not fully protected because the configuration has changed or a drive has failed.
+#  Failed (FLD) – The volume has failed.
+#  Missing (MIS) – The volume is missing.
+#  Initializing (INIT) – The volume is initializing.
+#  Online (ONL) – The volume is online.
+# Physical device State values are as follows:
+#  Online (ONL) – The drive is operational and is part of a volume.
+#  Hot Spare (HSP) – The drive is a hot spare that is available to replace a failed drive in a volume.
+#  Ready (RDY) – The drive is ready for use as a normal disk drive, or it is ready to be assigned to a volume or a hot spare pool.
+#  Available (AVL) – The drive might not be ready, and it is not suitable for use in a volume or a hot spare pool.
+#  Failed (FLD) – The drive failed and is now offline.
+# n Missing (MIS) – The drive has been removed or is not responding.
+#  Standby (SBY) – The device is not a hard-disk device.
+#  Out of Sync (OSY) – The drive, which is part of an Integrated RAID volume, is not in sync with other drives that are part of the volume.
+#  Degraded (DGD) – The drive is part of a volume and is in degraded state.
+#  Rebuilding (RBLD) – The drive is part of a volume and is currently rebuilding.
+#  Optimal (OPT) – The drive is optimal and is part of a volume.
+# Physical device Drive Type values are as follows:
+#  SAS_HDD – The drive is a SAS HDD.
+#  SATA_HDD – The drive is a SATA HDD.
+#  SAS_SSD – The drive is a SAS SSD.
+#  SATA_SSD – The drive is a SATA SSD.
+# Physical device Protocol values are as follows:
+#  SAS – The drive supports SAS protocol.
+#  SATA – The drive supports SATA protocol.
+#
+
+#
+#  Copyright 2014 Leo Eibler (http://www.eibler.at)
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+def inventory_sas2ircu(info):
+    inventory = []
+    for line in info:
+	itemName = ""
+	if line[0] == "volume":
+	    #   input: volume 0 79 okay_(oky) 0691440a258e54cc raid1 1907200
+	    #   itemName=VOLUME 0/79 (raid1, 1862GB)
+	    itemName = "VOLUME "+line[1]+"/"+line[2]+" ("+line[5]+", "+str(int(line[6])/1024)+"GB)"
+	elif line[0] == "disk":
+	    #   input: disk 0 1 optimal_(opt) 5000c50-0-569f-8055 seagate st2000nm0023 z1x091jj sas sas_hdd
+	    #   itemName=DISK 0/1 ST2000NM0023_Z1X091JJ (SAS_HDD)
+	    itemName = "DISK "+line[1]+"/"+line[2]+" "+line[6].upper()+"_"+line[7].upper()+" ("+line[9].upper()+")"
+	if len(itemName) > 0:
+            inventory.append((itemName, None))
+    return inventory
+
+
+def check_sas2ircu(item, params, info):
+    infoText = ""
+
+    for line in info:
+	itemName = ""
+	if line[0] == "volume":
+	    #   input: volume 0 79 okay_(oky) 0691440a258e54cc raid1 1907200
+	    #   itemName=VOLUME 0/79 (raid1, 1862GB)
+	    itemName = "VOLUME "+line[1]+"/"+line[2]+" ("+line[5]+", "+str(int(line[6])/1024)+"GB)"
+	    infoText = "Volume Status "+line[3]
+	elif line[0] == "disk":
+	    #   input: disk 0 1 optimal_(opt) 5000c50-0-569f-8055 seagate st2000nm0023 z1x091jj sas sas_hdd
+	    #   itemName=DISK 0/1 ST2000NM0023_Z1X091JJ (SAS_HDD)
+	    itemName = "DISK "+line[1]+"/"+line[2]+" "+line[6].upper()+"_"+line[7].upper()+" ("+line[9].upper()+")"
+	    infoText = "Disk Status "+line[3]
+	if itemName == item:
+	    if line[0] == "volume":
+		if line[3] == "okay_(oky)":
+		    return (0, "OK - %s" % infoText)
+		elif line[3] == "failed_(fld)" or line[3] == "missing_(mis)" :
+		    return (2, "CRIT - %s" % infoText)
+		else:
+		    return (1, "WARN - %s" % infoText)
+	    if line[0] == "disk":
+		if line[3] == "optimal_(opt)" or line[3] == "hot_spare_(hsp)" or line[3] == "ready_(rdy)":
+		    return (0, "OK - %s" % infoText)
+		elif line[3] == "failed_(fld)" or line[3] == "missing_(mis)" or line[3] == "out_of_sync_(osy)" or line[3] == "degraded_(dgd)" :
+		    return (2, "CRIT - %s" % infoText)
+		else:
+		    return (1, "WARN - %s" % infoText)
+    return (3, "UNKNOWN - Invalid check output from %s" % item)
+
+
+check_info["sas2ircu"] = {
+    'check_function':		check_sas2ircu,
+    'inventory_function':	inventory_sas2ircu,
+    'service_description':	'%s',
+    'has_perfdata':		False
+}
+

@@ -1,10 +1,17 @@
 check_mk-sas2ircu
 =================
 
-Check_MK Check for SAS2IRCU Raid Controller used in Dell R200 Server
+Check_MK Check for SAS2IRCU Raid Controller (used in Dell R200 Server)
 
 This is a free check (agent plugin and server side check) to monitor the state of
 disks and volumes connected to a sas2ircu raid controller.
+
+Copy the 'agent/pugins/sas2ircu' file to plugin directory of your agent.
+Copy the 'check_mk/checks/sas2ircu' file to checks directory of your check_mk installation.
+(for omd use the '/omd/sites/<yoursite>/local/share/check_mk/checks' directory)
+
+Tested with OMD and check_mk 1.2.2p1.
+
 
 Copyright 2014 Leo Eibler (http://www.eibler.at)
 
