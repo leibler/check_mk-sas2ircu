@@ -97,7 +97,7 @@ for i in range( 0, 255 ):
 		checkNextController = False
 		break
 	    parts = map( str.strip, line.split(":") )
-	    if parts[0] == "sas2ircu" or parts[0].startswith("------") or len(parts[0]) == 0:
+	    if parts[0] == "sas2ircu" or parts[0].startswith("------") or parts[0].startswith("ir volume") or len(parts[0]) == 0:
 		if mode == "volume":
 		    if volume['controller'] != "-1":
 			listVolumes.append(volume)
