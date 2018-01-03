@@ -20,7 +20,7 @@ check_mk installation (for omd use '/omd/sites/<yoursite>/local/share/check_mk/c
 Tested with OMD and check_mk 1.2.2p1.
 
 
-Copyright 2014 Leo Eibler (http://www.eibler.at)
+Copyright 2014-2018 Leo Eibler (http://www.eibler.at)
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.

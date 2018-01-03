@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 # Author: Leo Eibler <le@sprossenwanne.at>
-# Date last updated: 2014-01-09
+# Date last updated: 2018-01-03
 #
 # This is the server side check_mk check for sas2ircu raid controller (used in dell r200, r210, r210II servers)
 #
@@ -44,7 +44,7 @@
 #
 
 #
-#  Copyright 2014 Leo Eibler (http://www.eibler.at)
+#  Copyright 2014-2018 Leo Eibler (http://www.eibler.at)
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -60,54 +60,97 @@
 #
 
 def inventory_sas2ircu(info):
-    inventory = []
-    for line in info:
-	itemName = ""
-	if line[0] == "volume":
-	    #   input: volume 0 79 okay_(oky) 0691440a258e54cc raid1 1907200
-	    #   itemName=VOLUME 0/79 (raid1, 1862GB)
-	    itemName = "VOLUME "+line[1]+"/"+line[2]+" ("+line[5]+", "+str(int(line[6])/1024)+"GB)"
-	elif line[0] == "disk":
-	    #   input: disk 0 1 optimal_(opt) 5000c50-0-569f-8055 seagate st2000nm0023 z1x091jj sas sas_hdd
-	    #   itemName=DISK 0/1 ST2000NM0023_Z1X091JJ (SAS_HDD)
-	    itemName = "DISK "+line[1]+"/"+line[2]+" "+line[6].upper()+"_"+line[7].upper()+" ("+line[9].upper()+")"
-	if len(itemName) > 0:
-            inventory.append((itemName, None))
-    return inventory
+	inventory = []
+	for line in info:
+		itemName = ""
+		if line[0] == "volume":
+			#   input: volume 0 79 okay_(oky) 0691440a258e54cc raid1 1907200
+			#   itemName=VOLUME 0/79 (raid1, 1862GB)
+			itemName = "VOLUME "+line[1]+"/"+line[2]+" ("+line[5]+", "+str(int(line[6])/1024)+"GB)"
+		elif line[0] == "disk":
+			#   input: disk 0 1 optimal_(opt) 5000c50-0-569f-8055 seagate st2000nm0023 z1x091jj sas sas_hdd
+			#   itemName=DISK 0/1 ST2000NM0023_Z1X091JJ (SAS_HDD)
+			itemName = "DISK "+line[1]+"/"+line[2]+" "+line[6].upper()+"_"+line[7].upper()+" ("+line[9].upper()+")"
+		if len(itemName) > 0:
+			inventory.append((itemName, None))
+	return inventory
 
 
 def check_sas2ircu(item, params, info):
-    infoText = ""
+	infoText = ""
 
-    for line in info:
-	itemName = ""
-	if line[0] == "volume":
-	    #   input: volume 0 79 okay_(oky) 0691440a258e54cc raid1 1907200
-	    #   itemName=VOLUME 0/79 (raid1, 1862GB)
-	    itemName = "VOLUME "+line[1]+"/"+line[2]+" ("+line[5]+", "+str(int(line[6])/1024)+"GB)"
-	    infoText = "Volume Status "+line[3]
-	elif line[0] == "disk":
-	    #   input: disk 0 1 optimal_(opt) 5000c50-0-569f-8055 seagate st2000nm0023 z1x091jj sas sas_hdd
-	    #   itemName=DISK 0/1 ST2000NM0023_Z1X091JJ (SAS_HDD)
-	    itemName = "DISK "+line[1]+"/"+line[2]+" "+line[6].upper()+"_"+line[7].upper()+" ("+line[9].upper()+")"
-	    infoText = "Disk Status "+line[3]
-	if itemName == item:
-	    if line[0] == "volume":
-		if line[3] == "okay_(oky)":
-		    return (0, "OK - %s" % infoText)
-		elif line[3] == "failed_(fld)" or line[3] == "missing_(mis)" :
-		    return (2, "CRIT - %s" % infoText)
-		else:
-		    return (1, "WARN - %s" % infoText)
-	    if line[0] == "disk":
-		if line[3] == "optimal_(opt)" or line[3] == "hot_spare_(hsp)" or line[3] == "ready_(rdy)":
-		    return (0, "OK - %s" % infoText)
-		elif line[3] == "failed_(fld)" or line[3] == "missing_(mis)" or line[3] == "out_of_sync_(osy)" or line[3] == "degraded_(dgd)" :
-		    return (2, "CRIT - %s" % infoText)
-		else:
-		    return (1, "WARN - %s" % infoText)
-    return (3, "UNKNOWN - Invalid check output from %s" % item)
-
+	for line in info:
+		print line
+		itemName = ""
+		if line[0] == "volume":
+			#   input: volume 0 79 okay_(oky) 0691440a258e54cc raid1 1907200
+			#   itemName=VOLUME 0/79 (raid1, 1862GB)
+			itemName = "VOLUME"
+			if( len(line) > 1 ):
+				itemName += " "+line[1]
+			else:
+				itemName += " ?"
+			if( len(line) > 2 ):
+				itemName += "/"+line[2]
+			else:
+				itemName += "/?"
+			if( len(line) > 5 ):
+				itemName += " ("+line[5]
+			else:
+				itemName += " (unknown"
+			if( len(line) > 6 ):
+				itemName += ", "+str(int(line[6])/1024)+"GB)"
+			else:
+				itemName += ", ?GB)"
+			#itemName = "VOLUME "+line[1]+"/"+line[2]+" ("+line[5]+", "+str(int(line[6])/1024)+"GB)"
+			if( len(line) > 3 ):
+				infoText = "Volume Status "+line[3]
+			else:
+				infoText = "Volume Status "+"UNKNOWN"
+		elif line[0] == "disk":
+			#   input: disk 0 1 optimal_(opt) 5000c50-0-569f-8055 seagate st2000nm0023 z1x091jj sas sas_hdd
+			#   input: disk 0 0 missing_(mis) 0000000-0-0000-0000                      9xg90a75 - undetermined
+			#   itemName=DISK 0/1 ST2000NM0023_Z1X091JJ (SAS_HDD)
+			if( len(line) > 1 ):
+				itemName = "DISK "+line[1]
+			else:
+				itemName = "DISK ?"
+			if( len(line) > 2 ):
+				itemName += "/"+line[2]
+			else:
+				itemName += "/?"
+			if( len(line) > 6 ):
+				itemName += " "+line[6].upper()
+			else:
+				itemName += " UNKNOWN"
+			if( len(line) > 7 ):
+				itemName += "_"+line[7].upper()
+			else:
+				itemName += "_UNKNOWN"
+			if( len(line) > 9 ):
+				itemName += " ("+line[9].upper()+")"
+			else:
+				itemName += " (UNKNOWN)"
+			if( len(line) > 3 ):
+				infoText = "Disk Status "+line[3]
+			else:
+				infoText = "Disk Status "+"UNKNOWN"
+		if itemName == item:
+			if line[0] == "volume":
+				if line[3] == "okay_(oky)":
+					return (0, "OK - %s" % infoText)
+				elif line[3] == "failed_(fld)" or line[3] == "missing_(mis)" :
+					return (2, "CRIT - %s" % infoText)
+				else:
+					return (1, "WARN - %s" % infoText)
+			if line[0] == "disk":
+				if line[3] == "optimal_(opt)" or line[3] == "hot_spare_(hsp)" or line[3] == "ready_(rdy)":
+					return (0, "OK - %s" % infoText)
+				elif line[3] == "failed_(fld)" or line[3] == "missing_(mis)" or line[3] == "out_of_sync_(osy)" or line[3] == "degraded_(dgd)" :
+					return (2, "CRIT - %s" % infoText)
+				else:
+					return (1, "WARN - %s" % infoText)
+	return (3, "UNKNOWN - Invalid check output from %s" % item)
 
 check_info["sas2ircu"] = {
     'check_function':		check_sas2ircu,
