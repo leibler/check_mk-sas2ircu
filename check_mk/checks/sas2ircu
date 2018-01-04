@@ -80,7 +80,6 @@ def check_sas2ircu(item, params, info):
 	infoText = ""
 
 	for line in info:
-		print line
 		itemName = ""
 		if line[0] == "volume":
 			#   input: volume 0 79 okay_(oky) 0691440a258e54cc raid1 1907200
