@@ -11,11 +11,12 @@ The utility 'sas2ircu' debian x64 package can be downloaded from
 http://hwraid.le-vert.net/debian/pool-wheezy/sas2ircu_16.00.00.00-1_amd64.deb and
 installed with 'dpkg -i sas2ircu_16.00.00.00-1_amd64.deb'.
 
-Copy the 'agent/pugins/sas2ircu' file to plugin directory of your agent.
-Copy the 'check_mk/checks/sas2ircu' file to checks directory of your check_mk installation
+Copy the 'agents/pugins/sas2ircu' file to plugin directory of your agent.
+Copy the 'checks/sas2ircu' file to checks directory of your check_mk installation
 (for omd use the '/omd/sites/<yoursite>/local/share/check_mk/checks' directory).
-Copy the 'check_mk/checkman/sas2ircu' manpage file to man page directory of your 
+Copy the 'checkman/sas2ircu' manpage file to man page directory of your 
 check_mk installation (for omd use '/omd/sites/<yoursite>/local/share/check_mk/checkman' directory).
+Or just use the provided MKP file.
 
 Tested with OMD and check_mk 1.2.2p1.
 
