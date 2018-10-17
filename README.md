@@ -2,20 +2,20 @@ check_mk-sas2ircu
 =================
 
 Check_MK Check for LSI SAS2008, Dell PERC H200 Raid Controller (used in Dell R200, R210, R210II Servers)
-using 'sas2ircu' commandline utility which has to be installed to use this plugin.
+using `sas2ircu` commandline utility which has to be installed to use this plugin.
 
 This is a check (agent plugin and server side check) to monitor the state of
-physical disks and volumes connected to a raid controller addressed by 'sas2ircu' cli utility.
+physical disks and volumes connected to a raid controller addressed by `sas2ircu` cli utility.
 
-The utility 'sas2ircu' debian x64 package can be downloaded from 
+The utility `sas2ircu` debian x64 package can be downloaded from 
 http://hwraid.le-vert.net/debian/pool-wheezy/sas2ircu_16.00.00.00-1_amd64.deb and
-installed with 'dpkg -i sas2ircu_16.00.00.00-1_amd64.deb'.
+installed with `dpkg -i sas2ircu_16.00.00.00-1_amd64.deb`.
 
-Copy the 'agents/pugins/sas2ircu' file to plugin directory of your agent.
-Copy the 'checks/sas2ircu' file to checks directory of your check_mk installation
-(for omd use the '/omd/sites/<yoursite>/local/share/check_mk/checks' directory).
-Copy the 'checkman/sas2ircu' manpage file to man page directory of your 
-check_mk installation (for omd use '/omd/sites/<yoursite>/local/share/check_mk/checkman' directory).
+Copy the `agents/pugins/sas2ircu` file to plugin directory of your agent.
+Copy the `checks/sas2ircu` file to checks directory of your check_mk installation
+(for omd use the `/omd/sites/$yoursite/local/share/check_mk/checks` directory).
+Copy the `checkman/sas2ircu' manpage file to man page directory of your 
+check_mk installation (for omd use `/omd/sites/$yoursite/local/share/check_mk/checkman` directory).
 Or just use the provided MKP file.
 
 Tested with OMD and check_mk 1.2.2p1.
